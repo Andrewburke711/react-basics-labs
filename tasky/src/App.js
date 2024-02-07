@@ -6,10 +6,6 @@ import { v4 as uuidv4 } from 'uuid';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
 
 function App() {
   const [taskState, setTaskState] = useState({
@@ -65,12 +61,18 @@ function App() {
     event.preventDefault();
 
     const tasks = [...taskState.tasks];
-    const form = { ...formState };
-
-    form.id = uuidv4();
+    const newTask = { ...formState, id: uuidv4() };
     
-    tasks.push(form);
+    tasks.push(newTask);
     setTaskState({ tasks });
+
+    // Reset formState
+    setFormState({
+      title: "",
+      description: "",
+      deadline: "",
+      priority: "Low"
+    });
   }
 
   return (
@@ -124,23 +126,7 @@ function App() {
         }}
       >
         <Grid container justifyContent="center">
-          <form onSubmit={formSubmitHandler}>
-            <FormControl fullWidth>
-              <InputLabel id="priority-label">Priority</InputLabel>
-              <Select
-                labelId="priority-label"
-                id="priority"
-                name="priority"
-                value={formState.priority}
-                onChange={formChangeHandler}
-              >
-                <MenuItem value="Low">Low</MenuItem>
-                <MenuItem value="Medium">Medium</MenuItem>
-                <MenuItem value="High">High</MenuItem>
-              </Select>
-            </FormControl>
-            <AddTaskForm change={formChangeHandler} />
-          </form>
+          <AddTaskForm change={formChangeHandler} submit={formSubmitHandler} />
         </Grid>
       </Container>
       {/* End Footer */}
