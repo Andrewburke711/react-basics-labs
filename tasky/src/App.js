@@ -6,67 +6,71 @@ import { v4 as uuidv4 } from 'uuid';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 
 function App() {
-  const [ taskState, setTaskState ] = useState({
+  const [taskState, setTaskState] = useState({
     tasks: [
-      { id: 1, title:"Dishes", description: "Empty dishwasher", deadline: "Today", done: false },
-      { id: 2, title: "Laundry", description: "Fold clothes and put away", deadline: "Tomorrow", done: false },
-      { id: 3, title: "Tidy up", deadline: "Today", done: false}
+      { id: 1, title:"Dishes", description: "Empty dishwasher", deadline: "Today", priority: "Low", done: false },
+      { id: 2, title: "Laundry", description: "Fold clothes and put away", deadline: "Tomorrow", priority: "Medium", done: false },
+      { id: 3, title: "Tidy up", deadline: "Today", priority: "High", done: false}
     ]
   });
 
-  const [ formState, setFormState ] = useState({
+  const [formState, setFormState] = useState({
     title: "",
     description: "",
-    deadline: ""
+    deadline: "",
+    priority: "Low" // default priority
   });
   
   const formChangeHandler = (event) => {
-    let form = {...formState};
+    let form = { ...formState };
 
-    switch(event.target.name) {
+    switch (event.target.name) {
       case "title":
-          form.title = event.target.value;
-          break;
+        form.title = event.target.value;
+        break;
       case "description":
-          form.description = event.target.value;
-          break;
+        form.description = event.target.value;
+        break;
       case "deadline":
-          form.deadline = event.target.value;
-          break;
+        form.deadline = event.target.value;
+        break;
+      case "priority":
+        form.priority = event.target.value;
+        break;
       default:
-          form = formState;
+        form = formState;
     }
     setFormState(form);
   }
 
-  console.log(formState);
-
-
   const doneHandler = (taskIndex) => {
     const tasks = [...taskState.tasks];
     tasks[taskIndex].done = !tasks[taskIndex].done;
-    setTaskState({tasks});
-    console.log(`${taskIndex} ${tasks[taskIndex].done}`);
+    setTaskState({ tasks });
   }
 
   const deleteHandler = (taskIndex) => {
     const tasks = [...taskState.tasks];
     tasks.splice(taskIndex, 1);
-    setTaskState({tasks});
+    setTaskState({ tasks });
   } 
 
   const formSubmitHandler = (event) => {
     event.preventDefault();
 
     const tasks = [...taskState.tasks];
-    const form = {...formState};
+    const form = { ...formState };
 
     form.id = uuidv4();
     
     tasks.push(form);
-    setTaskState({tasks});
+    setTaskState({ tasks });
   }
 
   return (
@@ -99,10 +103,11 @@ function App() {
                 title={task.title}
                 description={task.description}
                 deadline={task.deadline}
+                priority={task.priority}
                 done={task.done}
                 key={task.id}
-                markDone = {() => doneHandler(index)}
-                deleteTask = {() => deleteHandler(index)}
+                markDone={() => doneHandler(index)}
+                deleteTask={() => deleteHandler(index)}
               />
           ))}
         </Grid>
@@ -119,15 +124,28 @@ function App() {
         }}
       >
         <Grid container justifyContent="center">
-          <AddTaskForm submit={formSubmitHandler} change={formChangeHandler} />
+          <form onSubmit={formSubmitHandler}>
+            <FormControl fullWidth>
+              <InputLabel id="priority-label">Priority</InputLabel>
+              <Select
+                labelId="priority-label"
+                id="priority"
+                name="priority"
+                value={formState.priority}
+                onChange={formChangeHandler}
+              >
+                <MenuItem value="Low">Low</MenuItem>
+                <MenuItem value="Medium">Medium</MenuItem>
+                <MenuItem value="High">High</MenuItem>
+              </Select>
+            </FormControl>
+            <AddTaskForm change={formChangeHandler} />
+          </form>
         </Grid>
       </Container>
       {/* End Footer */}
-
-  <AddTaskForm submit={formSubmitHandler} change={formChangeHandler} />
-
     </div>
-  )
-  ;
-  }
+  );
+}
+
 export default App;
